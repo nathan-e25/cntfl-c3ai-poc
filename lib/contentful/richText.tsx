@@ -21,7 +21,14 @@ type RenderOptions = {
   paragraphClassName?: string;
   listClassName?: string;
   listItemClassName?: string;
+  /** Class for hyperlinks (default: "underline"). */
+  linkClassName?: string;
+  /** Open hyperlinks in a new tab (adds rel="noopener") and label them with their text. */
+  linkNewTab?: boolean;
 };
+
+const nodeText = (nodes: RichTextNode[] = []): string =>
+  nodes.map((n) => n.value ?? nodeText(n.content)).join("");
 
 const renderText = (node: RichTextNode, key: number): ReactNode => {
   let out: ReactNode = node.value ?? "";
@@ -41,15 +48,22 @@ const renderText = (node: RichTextNode, key: number): ReactNode => {
   return <span key={key}>{out}</span>;
 };
 
-const renderInline = (nodes: RichTextNode[] = []): ReactNode[] =>
+const renderInline = (nodes: RichTextNode[] = [], options: RenderOptions = {}): ReactNode[] =>
   nodes.map((node, i) => {
     switch (node.nodeType) {
       case "text":
         return renderText(node, i);
       case "hyperlink":
         return (
-          <a key={i} href={node.data?.uri} className="underline">
-            {renderInline(node.content)}
+          <a
+            key={i}
+            href={node.data?.uri}
+            className={options.linkClassName ?? "underline"}
+            target={options.linkNewTab ? "_blank" : undefined}
+            rel={options.linkNewTab ? "noopener" : undefined}
+            aria-label={options.linkNewTab ? nodeText(node.content) : undefined}
+          >
+            {renderInline(node.content, options)}
           </a>
         );
       default:
@@ -66,7 +80,7 @@ const renderBlocks = (
       case "paragraph":
         return (
           <p key={i} className={options.paragraphClassName}>
-            {renderInline(node.content)}
+            {renderInline(node.content, options)}
           </p>
         );
       case "unordered-list":

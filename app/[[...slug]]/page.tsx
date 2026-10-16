@@ -5,6 +5,8 @@ import { getFooter } from "@/lib/contentful/footer";
 import { getHeader } from "@/lib/contentful/header";
 import { Footer } from "@/components/global/Footer";
 import { Header } from "@/components/global/Header";
+import { getNotification } from "@/lib/contentful/notification";
+import { Notification } from "@/components/global/Notification";
 import { SectionsRenderer } from "@/lib/sections/SectionsRenderer";
 import { splitLocaleFromSlug } from "@/lib/i18n/locale";
 import type { SeoEntry } from "@/lib/sections/types";
@@ -156,10 +158,11 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
   const { slug } = await params;
   const { locale, rest } = splitLocaleFromSlug(slug);
   const slugPath = slugPathFrom(rest);
-  const [page, header, footer] = await Promise.all([
+  const [page, header, footer, notification] = await Promise.all([
     getFlexiblePageBySlug(slugPath, { locale: locale.contentfulCode }),
     getHeader({ locale: locale.contentfulCode }),
     getFooter({ locale: locale.contentfulCode }),
+    getNotification({ locale: locale.contentfulCode }),
   ]);
   if (!page) notFound();
 
@@ -179,6 +182,7 @@ export default async function FlexiblePageRoute({ params }: PageProps) {
         <SectionsRenderer sections={page.sections} />
       </main>
       {footer ? <Footer footer={footer} /> : null}
+      {notification ? <Notification notification={notification} /> : null}
     </>
   );
 }

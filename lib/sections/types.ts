@@ -264,6 +264,26 @@ export type HeaderData = {
   searchAction: string;
 };
 
+export type NotificationFrontEndComponent = "Notification Default";
+
+export type NotificationData = {
+  id: string;
+  frontEndComponent: NotificationFrontEndComponent | null;
+  heading: string | null;
+  body: RichTextDocument | null;
+  optOutLabel: string;
+  modalTitle: string;
+  modalBody: RichTextDocument | null;
+  checkboxLabel: string;
+  cancelLabel: string;
+  saveLabel: string;
+  successText: string;
+  /** May contain `{seconds}`, replaced by the live countdown. */
+  successSubtext: string;
+  countdownSeconds: number;
+  poweredBy: { label: string; logoUrl: string | null; url: string | null } | null;
+};
+
 export type Section =
   | UnknownSection
   | BannerSection
